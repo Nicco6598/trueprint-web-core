@@ -12,10 +12,34 @@ import {
 import { getMockStats, mockCertificates } from '@/lib/mock-data'
 
 const statCards = [
-  { title: 'Totale', key: 'total' as const, icon: FileCheck },
-  { title: 'Attivi', key: 'active' as const, icon: ShieldCheck },
-  { title: 'In bozza', key: 'draft' as const, icon: FileText },
-  { title: 'Revocati', key: 'revoked' as const, icon: ShieldOff },
+  {
+    title: 'Totale',
+    key: 'total' as const,
+    icon: FileCheck,
+    iconClass: 'text-muted-foreground/60',
+    valueClass: 'text-foreground',
+  },
+  {
+    title: 'Attivi',
+    key: 'active' as const,
+    icon: ShieldCheck,
+    iconClass: 'text-emerald-500',
+    valueClass: 'text-emerald-600',
+  },
+  {
+    title: 'In bozza',
+    key: 'draft' as const,
+    icon: FileText,
+    iconClass: 'text-amber-500',
+    valueClass: 'text-amber-600',
+  },
+  {
+    title: 'Revocati',
+    key: 'revoked' as const,
+    icon: ShieldOff,
+    iconClass: 'text-red-400',
+    valueClass: 'text-red-600',
+  },
 ]
 
 export default function DashboardPage() {
@@ -34,15 +58,15 @@ export default function DashboardPage() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {statCards.map(({ title, key, icon: Icon }) => (
+        {statCards.map(({ title, key, icon: Icon, iconClass, valueClass }) => (
           <div key={key} className="bg-card border p-4">
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-[10px] font-medium tracking-[0.12em] uppercase">
                 {title}
               </p>
-              <Icon className="text-muted-foreground/50 h-3.5 w-3.5" strokeWidth={1.5} />
+              <Icon className={`h-3.5 w-3.5 ${iconClass}`} strokeWidth={1.5} />
             </div>
-            <p className="mt-3 text-3xl font-bold tracking-tight">{stats[key]}</p>
+            <p className={`mt-3 text-3xl font-bold tracking-tight ${valueClass}`}>{stats[key]}</p>
           </div>
         ))}
       </div>
