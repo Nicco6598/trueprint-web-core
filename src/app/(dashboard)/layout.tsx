@@ -4,10 +4,9 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-
-  if (!session?.user) {
-    redirect('/login')
+  if (process.env.NODE_ENV !== 'development') {
+    const session = await auth()
+    if (!session?.user) redirect('/login')
   }
 
   return (
