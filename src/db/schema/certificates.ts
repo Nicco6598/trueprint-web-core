@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { brands } from './brands'
 
@@ -15,6 +16,10 @@ export const certificates = pgTable('certificates', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
+
+export const certificatesRelations = relations(certificates, ({ one }) => ({
+  brand: one(brands, { fields: [certificates.brandId], references: [brands.id] }),
+}))
 
 export type Certificate = typeof certificates.$inferSelect
 export type NewCertificate = typeof certificates.$inferInsert
