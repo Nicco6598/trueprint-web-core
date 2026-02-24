@@ -1,0 +1,147 @@
+'use client'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { createCertificate } from '@/actions/certificates'
+import { createCertificateSchema, type CreateCertificateInput } from '@/lib/schemas/certificate'
+import { mockBrands } from '@/lib/mock-data'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+
+export function CreateCertificateDialog() {
+  const [open, setOpen] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateCertificateInput>({
+    resolver: zodResolver(createCertificateSchema),
+    defaultValues: { brandId: mockBrands[0]?.id ?? '' },
+  })
+
+  async function onSubmit(data: CreateCertificateInput) {
+    const result = await createCertificate(data)
+    if (result.success) {
+      toast.success('Certificato creato con successo')
+      reset()
+      setOpen(false)
+    } else {
+      toast.error(result.error)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Nuovo certificato
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Crea certificato</DialogTitle>
+          <DialogDescription>
+            Compila i campi per emettere un nuovo certificato di autenticità.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Brand */}
+          <div className="space-y-1.5">
+            <Label htmlFor="brandId">Brand</Label>
+            <Select
+              defaultValue={mockBrands[0]?.id ?? ''}
+              onValueChange={(v) => setValue('brandId', v)}
+            >
+              <SelectTrigger id="brandId">
+                <SelectValue placeholder="Seleziona brand" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockBrands.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.brandId && <p className="text-destructive text-xs">{errors.brandId.message}</p>}
+          </div>
+
+          {/* Product name */}
+          <div className="space-y-1.5">
+            <Label htmlFor="productName">Nome prodotto</Label>
+            <Input id="productName" placeholder="es. Air Max 2024" {...register('productName')} />
+            {errors.productName && (
+              <p className="text-destructive text-xs">{errors.productName.message}</p>
+            )}
+          </div>
+
+          {/* Serial number */}
+          <div className="space-y-1.5">
+            <Label htmlFor="serialNumber">Numero seriale</Label>
+            <Input
+              id="serialNumber"
+              placeholder="es. SN-2025-001"
+              className="font-mono"
+              {...register('serialNumber')}
+            />
+            {errors.serialNumber && (
+              <p className="text-destructive text-xs">{errors.serialNumber.message}</p>
+            )}
+          </div>
+
+          {/* Metadata */}
+          <div className="space-y-1.5">
+            <Label htmlFor="metadata">
+              Metadati{' '}
+              <span className="text-muted-foreground text-xs font-normal">(opzionale)</span>
+            </Label>
+            <Textarea
+              id="metadata"
+              placeholder='{"colore": "nero", "taglia": "42"}'
+              className="font-mono text-xs"
+              rows={3}
+              {...register('metadata')}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Annulla
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Crea certificato
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
