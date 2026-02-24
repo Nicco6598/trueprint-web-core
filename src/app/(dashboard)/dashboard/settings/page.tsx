@@ -1,126 +1,91 @@
-import { ShieldCheck, User } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { mockBrands } from '@/lib/mock-data'
 
-// In produzione questi dati vengono dalla sessione Auth.js e dal DB
+// In produzione: dati dalla sessione Auth.js e dal DB
 const mockUser = {
   name: 'Marco Rossi',
   email: 'marco@novabrand.it',
-  image: null as string | null,
   role: 'brand' as const,
 }
 
-export default function SettingsPage() {
-  const initials = mockUser.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string
+  description?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="bg-card border">
+      <div className="border-b px-4 py-3">
+        <p className="text-sm font-medium">{title}</p>
+        {description && <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>}
+      </div>
+      <div className="px-4 py-4">{children}</div>
+    </div>
+  )
+}
 
+function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between py-2">
+      <p className="text-muted-foreground text-[10px] font-medium tracking-[0.1em] uppercase">
+        {label}
+      </p>
+      <p className={`text-sm ${mono ? 'font-mono' : 'font-medium'}`}>{value}</p>
+    </div>
+  )
+}
+
+export default function SettingsPage() {
   const brand = mockBrands[0]
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Impostazioni</h1>
-        <p className="text-muted-foreground text-sm">
+      {/* Page header */}
+      <div className="border-b pb-4">
+        <h1 className="text-lg font-semibold tracking-tight">Impostazioni</h1>
+        <p className="text-muted-foreground mt-0.5 text-xs">
           Gestisci il tuo profilo e le informazioni del brand.
         </p>
       </div>
 
-      {/* Profilo utente */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Profilo
-          </CardTitle>
-          <CardDescription>Le tue informazioni account.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={mockUser.image ?? undefined} alt={mockUser.name} />
-              <AvatarFallback className="text-lg">{initials}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-lg font-semibold">{mockUser.name}</p>
-              <p className="text-muted-foreground text-sm">{mockUser.email}</p>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground font-medium">Ruolo</p>
-              <Badge variant="secondary" className="mt-1 capitalize">
-                {mockUser.role}
-              </Badge>
-            </div>
-            <div>
-              <p className="text-muted-foreground font-medium">Autenticazione</p>
-              <p className="mt-1 font-medium">GitHub OAuth</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Profilo */}
+      <Section title="Profilo" description="Le tue informazioni account.">
+        <div className="divide-y">
+          <Row label="Nome" value={mockUser.name} />
+          <Row label="Email" value={mockUser.email} mono />
+          <Row label="Ruolo" value={mockUser.role} />
+          <Row label="Autenticazione" value="GitHub OAuth" />
+        </div>
+      </Section>
 
       {/* Brand */}
       {brand && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4" />
-              Brand
-            </CardTitle>
-            <CardDescription>Informazioni sul tuo brand certificato.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground font-medium">Nome</p>
-                <p className="mt-1 font-semibold">{brand.name}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground font-medium">Slug</p>
-                <p className="mt-1 font-mono">{brand.slug}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground font-medium">ID Brand</p>
-                <p className="text-muted-foreground mt-1 font-mono text-xs">{brand.id}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground font-medium">Membro dal</p>
-                <p className="mt-1">{brand.createdAt.toLocaleDateString('it-IT')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Section title="Brand" description="Informazioni sul tuo brand certificato.">
+          <div className="divide-y">
+            <Row label="Nome" value={brand.name} />
+            <Row label="Slug" value={brand.slug} mono />
+            <Row label="ID" value={brand.id} mono />
+            <Row label="Membro dal" value={brand.createdAt.toLocaleDateString('it-IT')} />
+          </div>
+        </Section>
       )}
 
-      {/* API info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Endpoint API iOS</CardTitle>
-          <CardDescription>
-            Usa questo endpoint per verificare i certificati dall&apos;app iOS.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted rounded-md p-3">
-            <p className="font-mono text-xs">GET /api/v1/certificates/[id]/verify</p>
-          </div>
-          <p className="text-muted-foreground mt-2 text-xs">
-            Restituisce <code className="bg-muted rounded px-1 py-0.5">status</code> e{' '}
-            <code className="bg-muted rounded px-1 py-0.5">data</code> per ogni certificato attivo.
-          </p>
-        </CardContent>
-      </Card>
+      {/* API */}
+      <Section
+        title="Endpoint API iOS"
+        description="Usa questo endpoint per verificare i certificati dall'app iOS."
+      >
+        <div className="bg-muted/50 border p-3">
+          <p className="font-mono text-xs">GET /api/v1/certificates/[id]/verify</p>
+        </div>
+        <p className="text-muted-foreground mt-2 text-xs">
+          Restituisce <code className="bg-muted px-1 py-0.5 font-mono">status</code> e{' '}
+          <code className="bg-muted px-1 py-0.5 font-mono">data</code> per ogni certificato attivo.
+        </p>
+      </Section>
     </div>
   )
 }

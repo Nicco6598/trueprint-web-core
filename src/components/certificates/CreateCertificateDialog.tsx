@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -57,32 +56,32 @@ export function CreateCertificateDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button size="sm" className="rounded-sm">
+          <Plus className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} />
           Nuovo certificato
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="rounded-sm sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Crea certificato</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base font-semibold">Crea certificato</DialogTitle>
+          <p className="text-muted-foreground text-xs">
             Compila i campi per emettere un nuovo certificato di autenticità.
-          </DialogDescription>
+          </p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-1">
           {/* Brand */}
           <div className="space-y-1.5">
-            <Label htmlFor="brandId">Brand</Label>
+            <Label className="text-xs font-medium tracking-[0.08em] uppercase">Brand</Label>
             <Select
               defaultValue={mockBrands[0]?.id ?? ''}
               onValueChange={(v) => setValue('brandId', v)}
             >
-              <SelectTrigger id="brandId">
+              <SelectTrigger id="brandId" className="rounded-sm text-sm">
                 <SelectValue placeholder="Seleziona brand" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-sm">
                 {mockBrands.map((b) => (
                   <SelectItem key={b.id} value={b.id}>
                     {b.name}
@@ -95,8 +94,13 @@ export function CreateCertificateDialog() {
 
           {/* Product name */}
           <div className="space-y-1.5">
-            <Label htmlFor="productName">Nome prodotto</Label>
-            <Input id="productName" placeholder="es. Air Max 2024" {...register('productName')} />
+            <Label className="text-xs font-medium tracking-[0.08em] uppercase">Nome prodotto</Label>
+            <Input
+              id="productName"
+              placeholder="es. Air Max 2024"
+              className="rounded-sm"
+              {...register('productName')}
+            />
             {errors.productName && (
               <p className="text-destructive text-xs">{errors.productName.message}</p>
             )}
@@ -104,11 +108,13 @@ export function CreateCertificateDialog() {
 
           {/* Serial number */}
           <div className="space-y-1.5">
-            <Label htmlFor="serialNumber">Numero seriale</Label>
+            <Label className="text-xs font-medium tracking-[0.08em] uppercase">
+              Numero seriale
+            </Label>
             <Input
               id="serialNumber"
               placeholder="es. SN-2025-001"
-              className="font-mono"
+              className="rounded-sm font-mono"
               {...register('serialNumber')}
             />
             {errors.serialNumber && (
@@ -118,25 +124,33 @@ export function CreateCertificateDialog() {
 
           {/* Metadata */}
           <div className="space-y-1.5">
-            <Label htmlFor="metadata">
+            <Label className="text-xs font-medium tracking-[0.08em] uppercase">
               Metadati{' '}
-              <span className="text-muted-foreground text-xs font-normal">(opzionale)</span>
+              <span className="text-muted-foreground font-normal tracking-normal normal-case">
+                (opzionale)
+              </span>
             </Label>
             <Textarea
               id="metadata"
               placeholder='{"colore": "nero", "taglia": "42"}'
-              className="font-mono text-xs"
+              className="rounded-sm font-mono text-xs"
               rows={3}
               {...register('metadata')}
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-sm"
+              onClick={() => setOpen(false)}
+            >
               Annulla
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" size="sm" className="rounded-sm" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
               Crea certificato
             </Button>
           </DialogFooter>

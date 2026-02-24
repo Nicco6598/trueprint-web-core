@@ -1,7 +1,6 @@
 import { FileCheck, FileText, ShieldCheck, ShieldOff } from 'lucide-react'
 import Link from 'next/link'
 import { StatusBadge } from '@/components/certificates/StatusBadge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -13,10 +12,10 @@ import {
 import { getMockStats, mockCertificates } from '@/lib/mock-data'
 
 const statCards = [
-  { title: 'Totale certificati', key: 'total' as const, icon: FileCheck, color: 'text-foreground' },
-  { title: 'Attivi', key: 'active' as const, icon: ShieldCheck, color: 'text-green-600' },
-  { title: 'In bozza', key: 'draft' as const, icon: FileText, color: 'text-amber-500' },
-  { title: 'Revocati', key: 'revoked' as const, icon: ShieldOff, color: 'text-destructive' },
+  { title: 'Totale', key: 'total' as const, icon: FileCheck },
+  { title: 'Attivi', key: 'active' as const, icon: ShieldCheck },
+  { title: 'In bozza', key: 'draft' as const, icon: FileText },
+  { title: 'Revocati', key: 'revoked' as const, icon: ShieldOff },
 ]
 
 export default function DashboardPage() {
@@ -25,75 +24,72 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-sm">
+      {/* Page header */}
+      <div className="border-b pb-4">
+        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-0.5 text-xs">
           Panoramica delle certificazioni del tuo brand.
         </p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {statCards.map(({ title, key, icon: Icon, color }) => (
-          <Card key={key}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">{title}</CardTitle>
-              <Icon className={`h-4 w-4 ${color}`} />
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{stats[key]}</p>
-            </CardContent>
-          </Card>
+      {/* KPI row */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {statCards.map(({ title, key, icon: Icon }) => (
+          <div key={key} className="bg-card border p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-muted-foreground text-[10px] font-medium tracking-[0.12em] uppercase">
+                {title}
+              </p>
+              <Icon className="text-muted-foreground/50 h-3.5 w-3.5" strokeWidth={1.5} />
+            </div>
+            <p className="mt-3 text-3xl font-bold tracking-tight">{stats[key]}</p>
+          </div>
         ))}
       </div>
 
       {/* Recent certificates */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Certificati recenti</CardTitle>
-              <CardDescription>Gli ultimi 5 certificati emessi.</CardDescription>
-            </div>
-            <Link
-              href="/dashboard/certificates"
-              className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
-            >
-              Vedi tutti →
-            </Link>
+      <div className="bg-card border">
+        <div className="flex items-center justify-between border-b px-4 py-3">
+          <div>
+            <p className="text-sm font-medium">Certificati recenti</p>
+            <p className="text-muted-foreground mt-0.5 text-xs">Ultimi 5 emessi</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Prodotto</TableHead>
-                <TableHead>Numero seriale</TableHead>
-                <TableHead>Brand</TableHead>
-                <TableHead>Stato</TableHead>
-                <TableHead className="text-right">Data</TableHead>
+          <Link
+            href="/dashboard/certificates"
+            className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+          >
+            Vedi tutti →
+          </Link>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Prodotto</TableHead>
+              <TableHead>Seriale</TableHead>
+              <TableHead>Brand</TableHead>
+              <TableHead>Stato</TableHead>
+              <TableHead className="text-right">Data</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {recent.map((cert) => (
+              <TableRow key={cert.id}>
+                <TableCell className="text-sm font-medium">{cert.productName}</TableCell>
+                <TableCell className="text-muted-foreground font-mono text-xs">
+                  {cert.serialNumber}
+                </TableCell>
+                <TableCell className="text-sm">{cert.brand.name}</TableCell>
+                <TableCell>
+                  <StatusBadge status={cert.status} />
+                </TableCell>
+                <TableCell className="text-muted-foreground text-right text-xs">
+                  {cert.createdAt.toLocaleDateString('it-IT')}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recent.map((cert) => (
-                <TableRow key={cert.id}>
-                  <TableCell className="font-medium">{cert.productName}</TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-xs">
-                    {cert.serialNumber}
-                  </TableCell>
-                  <TableCell>{cert.brand.name}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={cert.status} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-right text-sm">
-                    {cert.createdAt.toLocaleDateString('it-IT')}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
