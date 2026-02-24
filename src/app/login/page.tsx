@@ -1,4 +1,4 @@
-import { signIn } from '@/auth'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
@@ -10,16 +10,9 @@ export default function LoginPage() {
           <p className="text-muted-foreground text-sm">Accedi per gestire le certificazioni</p>
         </div>
 
-        <form
-          action={async () => {
-            'use server'
-            await signIn('github', { redirectTo: '/dashboard' })
-          }}
-        >
-          <Button type="submit" className="w-full">
-            Accedi con GitHub
-          </Button>
-        </form>
+        <Button asChild className="w-full">
+          <Link href="/dashboard">Accedi con GitHub</Link>
+        </Button>
       </div>
     </div>
   )
