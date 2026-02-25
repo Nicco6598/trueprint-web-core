@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2, Plus } from 'lucide-react'
+import { AlertCircle, Loader2, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,13 +9,7 @@ import { createCertificate } from '@/actions/certificates'
 import { createCertificateSchema, type CreateCertificateInput } from '@/lib/schemas/certificate'
 import { mockBrands } from '@/lib/mock-data'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -65,22 +59,34 @@ export function CreateCertificateDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5 rounded-sm">
+        <Button
+          size="sm"
+          className="bg-foreground text-background hover:bg-foreground/85 gap-1.5 rounded-none"
+        >
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           Nuovo certificato
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="rounded-sm p-0 sm:max-w-[460px]">
+      <DialogContent className="rounded-none p-0 sm:max-w-[460px]" showCloseButton={false}>
         {/* Header */}
-        <DialogHeader className="border-b px-5 py-4">
-          <DialogTitle className="text-sm font-semibold tracking-tight">
-            Crea certificato
-          </DialogTitle>
-          <p className="text-muted-foreground text-xs">
-            Emetti un nuovo certificato di autenticità per un prodotto fisico.
-          </p>
-        </DialogHeader>
+        <div className="flex items-start justify-between border-b px-5 py-4">
+          <div>
+            <DialogTitle className="text-sm font-semibold tracking-tight">
+              Crea certificato
+            </DialogTitle>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Emetti un nuovo certificato di autenticità per un prodotto fisico.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="text-muted-foreground hover:text-foreground ml-4 shrink-0 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4 px-5 py-4">
@@ -93,10 +99,10 @@ export function CreateCertificateDialog() {
                 defaultValue={mockBrands[0]?.id ?? ''}
                 onValueChange={(v) => setValue('brandId', v)}
               >
-                <SelectTrigger className="rounded-sm">
+                <SelectTrigger className="rounded-none">
                   <SelectValue placeholder="Seleziona brand" />
                 </SelectTrigger>
-                <SelectContent className="rounded-sm">
+                <SelectContent className="rounded-none">
                   {mockBrands.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
                       {b.name}
@@ -115,7 +121,7 @@ export function CreateCertificateDialog() {
                 </Label>
                 <Input
                   placeholder="Air Max 2024"
-                  className="rounded-sm"
+                  className="rounded-none"
                   {...register('productName')}
                 />
                 <FieldError message={errors.productName?.message} />
@@ -127,7 +133,7 @@ export function CreateCertificateDialog() {
                 </Label>
                 <Input
                   placeholder="SN-2025-001"
-                  className="rounded-sm font-mono text-sm"
+                  className="rounded-none font-mono text-sm"
                   {...register('serialNumber')}
                 />
                 <FieldError message={errors.serialNumber?.message} />
@@ -144,7 +150,7 @@ export function CreateCertificateDialog() {
               </Label>
               <Textarea
                 placeholder={'{"colore": "nero", "taglia": "42"}'}
-                className="rounded-sm font-mono text-xs"
+                className="rounded-none font-mono text-xs"
                 rows={3}
                 {...register('metadata')}
               />
@@ -155,9 +161,9 @@ export function CreateCertificateDialog() {
           <div className="bg-muted/20 flex items-center justify-end gap-2 border-t px-5 py-3">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="text-muted-foreground hover:text-foreground rounded-sm"
+              className="rounded-none border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/40"
               onClick={() => setOpen(false)}
             >
               Annulla
@@ -165,7 +171,7 @@ export function CreateCertificateDialog() {
             <Button
               type="submit"
               size="sm"
-              className="min-w-[120px] rounded-sm"
+              className="bg-foreground text-background hover:bg-foreground/85 min-w-[120px] rounded-none"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

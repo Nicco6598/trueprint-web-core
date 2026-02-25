@@ -1,6 +1,7 @@
 import { auth, signOut } from '@/auth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { PageBreadcrumb } from './PageBreadcrumb'
 
 export async function DashboardHeader() {
   const session = process.env.NODE_ENV !== 'development' ? await auth() : null
@@ -18,9 +19,7 @@ export async function DashboardHeader() {
   return (
     <header className="bg-background flex h-12 shrink-0 items-center justify-between border-b px-6">
       {/* Breadcrumb placeholder — può diventare dinamico */}
-      <p className="text-muted-foreground text-xs tracking-[0.1em] uppercase">
-        {user?.role ? `${user.role}` : 'Brand'}
-      </p>
+      <PageBreadcrumb />
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2.5">

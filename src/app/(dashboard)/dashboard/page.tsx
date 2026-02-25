@@ -15,6 +15,7 @@ const statCards = [
   {
     title: 'Totale',
     key: 'total' as const,
+    trendKey: 'totalThisMonth' as const,
     icon: FileCheck,
     iconClass: 'text-muted-foreground/60',
     valueClass: 'text-foreground',
@@ -22,6 +23,7 @@ const statCards = [
   {
     title: 'Attivi',
     key: 'active' as const,
+    trendKey: 'activeThisMonth' as const,
     icon: ShieldCheck,
     iconClass: 'text-emerald-500',
     valueClass: 'text-emerald-600',
@@ -29,6 +31,7 @@ const statCards = [
   {
     title: 'In bozza',
     key: 'draft' as const,
+    trendKey: 'draftThisMonth' as const,
     icon: FileText,
     iconClass: 'text-amber-500',
     valueClass: 'text-amber-600',
@@ -36,6 +39,7 @@ const statCards = [
   {
     title: 'Revocati',
     key: 'revoked' as const,
+    trendKey: 'revokedThisMonth' as const,
     icon: ShieldOff,
     iconClass: 'text-red-400',
     valueClass: 'text-red-600',
@@ -58,7 +62,7 @@ export default function DashboardPage() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {statCards.map(({ title, key, icon: Icon, iconClass, valueClass }) => (
+        {statCards.map(({ title, key, trendKey, icon: Icon, iconClass, valueClass }) => (
           <div key={key} className="bg-card border p-4">
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground text-[10px] font-medium tracking-[0.12em] uppercase">
@@ -67,6 +71,11 @@ export default function DashboardPage() {
               <Icon className={`h-3.5 w-3.5 ${iconClass}`} strokeWidth={1.5} />
             </div>
             <p className={`mt-3 text-3xl font-bold tracking-tight ${valueClass}`}>{stats[key]}</p>
+            {stats[trendKey] > 0 && (
+              <p className="text-muted-foreground mt-1 text-[10px]">
+                +{stats[trendKey]} questo mese
+              </p>
+            )}
           </div>
         ))}
       </div>
