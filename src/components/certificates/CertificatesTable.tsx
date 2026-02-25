@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Link2 } from 'lucide-react'
+import { Link2, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { StatusBadge } from './StatusBadge'
@@ -26,6 +26,7 @@ const filterLabels: Record<Filter, string> = {
 
 export function CertificatesTable({ certificates }: { certificates: MockCertificate[] }) {
   const [filter, setFilter] = useState<Filter>('all')
+  const [search, setSearch] = useState('')
 
   const counts: Record<Filter, number> = {
     all: certificates.length,
@@ -34,7 +35,13 @@ export function CertificatesTable({ certificates }: { certificates: MockCertific
     revoked: certificates.filter((c) => c.status === 'revoked').length,
   }
 
-  const filtered = filter === 'all' ? certificates : certificates.filter((c) => c.status === filter)
+  const filtered = certificates
+    .filter((c) => filter === 'all' || c.status === filter)
+    .filter((c) => {
+      if (!search) return true
+      const q = search.toLowerCase()
+      return c.productName.toLowerCase().includes(q) || c.serialNumber.toLowerCase().includes(q)
+    })
 
   function copyVerifyLink(id: string) {
     const url = `${window.location.origin}/api/v1/certificates/${id}/verify`
@@ -45,6 +52,7 @@ export function CertificatesTable({ certificates }: { certificates: MockCertific
 
   return (
     <div className="bg-card border">
+      {/* Toolbar */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-0.5">
           {(Object.keys(filterLabels) as Filter[]).map((f) => (
@@ -65,7 +73,30 @@ export function CertificatesTable({ certificates }: { certificates: MockCertific
             </button>
           ))}
         </div>
-        <p className="text-muted-foreground text-xs">{filtered.length} risultati</p>
+
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 h-3 w-3 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Cerca prodotto o seriale..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-48 border bg-transparent py-1 pr-7 pl-7 text-xs focus:ring-1 focus:ring-sky-400 focus:outline-none"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+          <p className="text-muted-foreground text-xs whitespace-nowrap">
+            {filtered.length} risultati
+          </p>
+        </div>
       </div>
 
       <Table>
@@ -111,8 +142,9 @@ export function CertificatesTable({ certificates }: { certificates: MockCertific
           {filtered.length === 0 && (
             <TableRow>
               <TableCell colSpan={7} className="text-muted-foreground py-10 text-center text-sm">
-                Nessun certificato
-                {filter !== 'all' ? ` con stato "${filterLabels[filter]}"` : ''}
+                {search
+                  ? `Nessun risultato per "${search}"`
+                  : `Nessun certificato${filter !== 'all' ? ` con stato "${filterLabels[filter]}"` : ''}`}
               </TableCell>
             </TableRow>
           )}

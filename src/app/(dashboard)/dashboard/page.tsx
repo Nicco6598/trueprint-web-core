@@ -1,14 +1,8 @@
 import { FileCheck, FileText, ShieldCheck, ShieldOff } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { CreateCertificateDialog } from '@/components/certificates/CreateCertificateDialog'
 import { StatusBadge } from '@/components/certificates/StatusBadge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { getMockStats, mockCertificates } from '@/lib/mock-data'
 
 const statCards = [
@@ -17,7 +11,9 @@ const statCards = [
     key: 'total' as const,
     trendKey: 'totalThisMonth' as const,
     icon: FileCheck,
-    iconClass: 'text-muted-foreground/60',
+    accentBorder: 'border-t-sky-400',
+    bgTint: 'bg-sky-50',
+    iconClass: 'text-sky-500',
     valueClass: 'text-foreground',
   },
   {
@@ -25,24 +21,30 @@ const statCards = [
     key: 'active' as const,
     trendKey: 'activeThisMonth' as const,
     icon: ShieldCheck,
+    accentBorder: 'border-t-emerald-400',
+    bgTint: 'bg-emerald-50',
     iconClass: 'text-emerald-500',
-    valueClass: 'text-emerald-600',
+    valueClass: 'text-emerald-700',
   },
   {
     title: 'In bozza',
     key: 'draft' as const,
     trendKey: 'draftThisMonth' as const,
     icon: FileText,
+    accentBorder: 'border-t-amber-400',
+    bgTint: 'bg-amber-50',
     iconClass: 'text-amber-500',
-    valueClass: 'text-amber-600',
+    valueClass: 'text-amber-700',
   },
   {
     title: 'Revocati',
     key: 'revoked' as const,
     trendKey: 'revokedThisMonth' as const,
     icon: ShieldOff,
-    iconClass: 'text-red-400',
-    valueClass: 'text-red-600',
+    accentBorder: 'border-t-rose-500',
+    bgTint: 'bg-rose-50',
+    iconClass: 'text-rose-500',
+    valueClass: 'text-rose-600',
   },
 ]
 
@@ -53,39 +55,46 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Page header */}
-      <div className="border-b pb-4">
-        <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-0.5 text-xs">
-          Panoramica delle certificazioni del tuo brand.
-        </p>
+      <div className="flex items-start justify-between border-b pb-4">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            Panoramica delle certificazioni del tuo brand.
+          </p>
+        </div>
+        <CreateCertificateDialog />
       </div>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {statCards.map(({ title, key, trendKey, icon: Icon, iconClass, valueClass }) => (
-          <div key={key} className="bg-card border p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-[10px] font-medium tracking-[0.12em] uppercase">
-                {title}
-              </p>
-              <Icon className={`h-3.5 w-3.5 ${iconClass}`} strokeWidth={1.5} />
+        {statCards.map(
+          ({ title, key, trendKey, icon: Icon, accentBorder, bgTint, iconClass, valueClass }) => (
+            <div key={key} className={`border border-t-2 p-4 ${accentBorder} ${bgTint}`}>
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground text-[10px] font-medium tracking-[0.12em] uppercase">
+                  {title}
+                </p>
+                <Icon className={`h-3.5 w-3.5 ${iconClass}`} strokeWidth={1.5} />
+              </div>
+              <p className={`mt-3 text-3xl font-bold tracking-tight ${valueClass}`}>{stats[key]}</p>
+              {stats[trendKey] > 0 && (
+                <p className="text-muted-foreground mt-1 text-[10px]">
+                  +{stats[trendKey]} questo mese
+                </p>
+              )}
             </div>
-            <p className={`mt-3 text-3xl font-bold tracking-tight ${valueClass}`}>{stats[key]}</p>
-            {stats[trendKey] > 0 && (
-              <p className="text-muted-foreground mt-1 text-[10px]">
-                +{stats[trendKey]} questo mese
-              </p>
-            )}
-          </div>
-        ))}
+          )
+        )}
       </div>
 
-      {/* Recent certificates */}
+      {/* Activity feed */}
       <div className="bg-card border">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div>
-            <p className="text-sm font-medium">Certificati recenti</p>
-            <p className="text-muted-foreground mt-0.5 text-xs">Ultimi 5 emessi</p>
+            <p className="text-sm font-medium">Attività recente</p>
+            <p className="text-muted-foreground mt-0.5 text-xs">
+              Ultimi {recent.length} certificati emessi
+            </p>
           </div>
           <Link
             href="/dashboard/certificates"
@@ -94,34 +103,27 @@ export default function DashboardPage() {
             Vedi tutti →
           </Link>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Prodotto</TableHead>
-              <TableHead>Seriale</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Stato</TableHead>
-              <TableHead className="text-right">Data</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {recent.map((cert) => (
-              <TableRow key={cert.id}>
-                <TableCell className="text-sm font-medium">{cert.productName}</TableCell>
-                <TableCell className="text-muted-foreground font-mono text-xs">
-                  {cert.serialNumber}
-                </TableCell>
-                <TableCell className="text-sm">{cert.brand.name}</TableCell>
-                <TableCell>
-                  <StatusBadge status={cert.status} />
-                </TableCell>
-                <TableCell className="text-muted-foreground text-right text-xs">
-                  {cert.createdAt.toLocaleDateString('it-IT')}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="divide-y">
+          {recent.map((cert) => (
+            <div key={cert.id} className="flex items-center gap-3 px-4 py-3">
+              <div
+                className={cn('h-1.5 w-1.5 shrink-0', {
+                  'bg-emerald-400': cert.status === 'active',
+                  'bg-amber-400': cert.status === 'draft',
+                  'bg-rose-400': cert.status === 'revoked',
+                })}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{cert.productName}</p>
+                <p className="text-muted-foreground font-mono text-xs">{cert.serialNumber}</p>
+              </div>
+              <StatusBadge status={cert.status} />
+              <p className="text-muted-foreground shrink-0 text-xs">
+                {cert.createdAt.toLocaleDateString('it-IT')}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
