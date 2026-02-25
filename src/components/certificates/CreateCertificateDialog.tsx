@@ -59,10 +59,7 @@ export function CreateCertificateDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          className="bg-foreground text-background hover:bg-foreground/85 gap-1.5 rounded-none"
-        >
+        <Button size="sm" className="gap-1.5 rounded-none bg-sky-600 text-white hover:bg-sky-700">
           <Plus className="h-3.5 w-3.5" strokeWidth={2} />
           Nuovo certificato
         </Button>
@@ -171,7 +168,7 @@ export function CreateCertificateDialog() {
             <Button
               type="submit"
               size="sm"
-              className="bg-foreground text-background hover:bg-foreground/85 min-w-[120px] rounded-none"
+              className="min-w-[120px] rounded-none bg-sky-600 text-white hover:bg-sky-700"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
